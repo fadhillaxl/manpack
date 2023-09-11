@@ -1,3 +1,4 @@
+#include <Ticker.h>
 #include <Stepper.h>
 #include <Wire.h>
 #include <MPU6050_light.h>
@@ -6,10 +7,14 @@
 #include <SoftwareSerial.h>
 #include <Sgp4.h>
 
+void FunctionGPS();
+Ticker timer5(FunctionGPS, 100, 0, MILLIS);
+
 const int limEU = 13;
 const int limED = 12;
 const int limAZ = 14;
 const unsigned long GPSPeriod = 3000;
+int step_stepper = 17;
 
 Sgp4 sat;
 SoftwareSerial serial_gps(17, 16);
@@ -104,28 +109,56 @@ void setup() {
   kalmanY.setAngle(0);
   setgps();
   sgp4();
+  GoTo_position_TLE();
+
+}
+
+void scanning_Y(){
+
+}
+
+void scanning_X(){
+  for(int x;x<=4;x++){
+    
+  }
+}
+
+void GoTo_position_TLE(){
+  mpu.update();
+  double kalman_Y = kalmanY.getAngle(mpu.getAngleY(), mpu.getAccAngleY() / 131.0, 0.01);
+  double Y = map(kalman_Y * 100, 0, 9000, 9000, 0);
+  while (int(Y) != sat.satEl) {
+  if (digitalRead(limEU) != HIGH) {
+    int stepDirection = (int(Y) > sat.satEl) ? step_stepper : -step_stepper;
+    myStepper.step(stepDirection);
+  } else {
+    if (int(Y) < sat.satEl) {
+      myStepper.step(-step_stepper);
+    }
+  }
+}
+
 
 }
 
 void loop() {
   mpu.update();
-  double kalman_Y = kalmanY.getAngle(mpu.getAngleY(), mpu.getAccAngleY() / 131.0, 0.01);s
+  double kalman_Y = kalmanY.getAngle(mpu.getAngleY(), mpu.getAccAngleY() / 131.0, 0.01);
   double Y = map(kalman_Y * 100, 0, 9000, 9000, 0);
   double kalman_X = kalmanY.getAngle(mpu.getAngleX(), mpu.getAccAngleX() / 131.0, 0.01);
   Serial.println(Y);
 
-  if (int(Y) > sat.satEl) {
-    myStepper.step(17);
-  }
-  else if (int(Y) < sat.satEl) {
-    myStepper.step(-17);
-  }
+
+  
+
+
+
 
   if (int(kalman_X) > sat.satAz) {
-    myStepperx.step(17);
+    myStepperx.step(step_stepper);
   }
   else if (int(kalman_X) < sat.satAz) {
-    myStepperx.step(-17);
+    myStepperx.step(-step_stepper);
   }
   delay(10);
 }
