@@ -6,7 +6,8 @@
 #include <Kalman.h>
 
 void mpurun();
-Stepper myStepperY(200*16, 4, 2);
+Stepper myStepperY(200*16, 19, 18);
+Stepper myStepperX(200*16, 4, 2);
 Ticker timer5(mpurun, 10, 0);
 // Ticker timer2(printCounter, 1000, 0, MILLIS);
 
@@ -17,7 +18,7 @@ double SetpointX, InputX, OutputX;
 
 
 MPU6050 mpu(Wire);
-double Kp=2, Ki=0.1, Kd=0.01;
+double Kp=5, Ki=0.1, Kd=1;
 PID myPIDY(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 PID myPIDX(&InputX, &OutputX, &SetpointX, Kp, Ki, Kd, DIRECT);
 
