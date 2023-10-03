@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onmousedown="start()" onmouseup="end()">RIGHT</button>
+    <button onmousedown="start_left()" onmouseup="end()">LEFT</button>
+    <button onclick="stop()" >STOP</button>
+  <p id="counter"></p>
+    <script src="script.js"></script>
+    <script>
+        var wrapper = document.getElementById('counter');
+        var counter;
+        var count = 0;
+        
+        function start() {
+          counter = setInterval(function() {
+            wrapper.innerHTML = count;
+            count++;
+            var jqxhr = $.get( "/right", function() {
+                  console.log("success")
+              })
+                .done(function() {
+                  console.log("second success")
+                })
+                .fail(function() {
+                  console.log("error")
+                })
+                .always(function() {
+                  console.log("finished")
+      
+                });
+          }, 500);
+        }
+        function start_left() {
+          counter = setInterval(function() {
+            wrapper.innerHTML = count;
+            count++;
+            var jqxhr = $.get( "/left", function() {
+                  console.log("success")
+              })
+                .done(function() {
+                  console.log("second success")
+                })
+                .fail(function() {
+                  console.log("error")
+                })
+                .always(function() {
+                  console.log("finished")
+      
+                });
+          }, 500);
+        }
+        function end() {
+          clearInterval(counter)
+        }
+        
+        function stop(){
+            var jqxhr = $.get( "/stop", function() {
+                  console.log("success")
+              })
+                .done(function() {
+                  console.log("second success")
+                })
+                .fail(function() {
+                  console.log("error")
+                })
+                .always(function() {
+                  console.log("finished")
+      
+                });
+        }
+        
+      </script>
+    <!-- <script src="script.js"></script> -->
+</body>
+</html>
